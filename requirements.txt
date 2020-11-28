@@ -1,0 +1,12 @@
+numpy>=1.18.1
+pandas>=1.0.3
+scikit-learn>=0.22.2
+tensorboard>=2.2.0
+tqdm>=4.45.0
+matplotlib>=2.2.3
+vispy>=0.5.3
+PyYAML>=5.1.1
+imgui[glfw]>=1.0.0 
+glfw>=1.8.3
+PyOpenGL>=3.1.0
+pyqt5>=5.8.1.1
