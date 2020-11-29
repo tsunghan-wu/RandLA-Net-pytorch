@@ -1,6 +1,8 @@
 # RandLA-Net-pytorch
 
-This repository contains the implementation of **RandLA-Net** (CVPR 2020 Oral) in PyTorch.
+This repository contains the implementation of [RandLA-Net (CVPR 2020 Oral)](https://arxiv.org/abs/1911.11236) in PyTorch.
+- We only support SemanticKITTI dataset now. (Welcome everyone to develop and raise PR)
+- Our model is almost as good as the original implementation. (Our 52.9% mIoU vs 53.9% reported in paper)
 
 ## Environment Setup
 
@@ -23,7 +25,7 @@ bash compile_op.sh
 Download the [Semantic KITTI dataset](http://semantic-kitti.org/dataset.html#download), and preprocess the data:
 
 ```
-python utils/data_prepare/data_prepare_semantickitti.py
+python data_prepare_semantickitti.py
 ```
 Note: 
 - Please change the dataset path in the `data_prepare_semantickitti.py` with your own path.
@@ -37,7 +39,7 @@ Note:
 python3 train_SemanticKITTI.py <args>
 ```
 
-The training script will create `runs/` directory, which stores checkpoints & training history (tnsorboard event)
+The training script will create `log/` directory, which stores checkpoints & training history (tnsorboard event)
 
 2. Testing
 
@@ -58,7 +60,7 @@ python3 visualize_SemanticKITTI.py <args>
 
 - Example Evaluation code
 ```
-python3 evaluate_semantics.py --dataset /work/patrickwu2/PCL_Seg_data/sequences_0.06/ --predictions runs/supervised/predictions/ --sequences 8
+python3 evaluate_semantics.py --dataset /tmp2/tsunghan/PCL_Seg_data/sequences_0.06/ --predictions runs/supervised/predictions/ --sequences 8
 ```
 
 ## Acknowledgement

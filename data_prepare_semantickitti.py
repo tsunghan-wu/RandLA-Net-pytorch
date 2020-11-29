@@ -1,27 +1,31 @@
-import pickle, yaml, os, sys
+import os
+import yaml
+import pickle
+import argparse
 import numpy as np
-from os.path import join, exists, dirname, abspath
+from os.path import join, exists
 from sklearn.neighbors import KDTree
+from utils.data_process import DataProcessing as DP
 
-BASE_DIR = dirname(abspath(__file__))
-ROOT_DIR = dirname(BASE_DIR)
-sys.path.append(BASE_DIR)
-sys.path.append(ROOT_DIR)
-from helper_tool import DataProcessing as DP
+parser = argparse.ArgumentParser()
+parser.add_argument('--src_path', default=None, help='source dataset path [default: None]')
+parser.add_argument('--dst_path', default=None, help='destination dataset path [default: None]')
+parser.add_argument('--grid_size', type=float, default=0.06, help='Subsample Grid Size [default: 0.06]')
+parser.add_argument('--yaml_config', default='utils/semantic-kitti.yaml', help='semantic-kitti.yaml path')
+FLAGS = parser.parse_args()
 
-data_config = os.path.join(BASE_DIR, 'semantic-kitti.yaml')
+
+data_config = FLAGS.yaml_config
 DATA = yaml.safe_load(open(data_config, 'r'))
 remap_dict = DATA["learning_map"]
 max_key = max(remap_dict.keys())
 remap_lut = np.zeros((max_key + 100), dtype=np.int32)
 remap_lut[list(remap_dict.keys())] = list(remap_dict.values())
 
-grid_size = 0.06
-# dataset_path = '/data/WQ/DataSet/semantic-kitti/dataset/sequences'
-dataset_path = '/work/patrickwu2/PCL_Seg_data/SemanticKitti/sequences'
-output_path = '/work/patrickwu2/PCL_Seg_data/sequences' + '_' + str(grid_size)
+grid_size = FLAGS.grid_size
+dataset_path = FLAGS.src_path
+output_path = FLAGS.dst_path
 seq_list = np.sort(os.listdir(dataset_path))
-
 for seq_id in seq_list:
     print('sequence' + seq_id + ' start')
     seq_path = join(dataset_path, seq_id)
