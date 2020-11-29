@@ -2,8 +2,25 @@
 
 This repository contains the implementation of [RandLA-Net (CVPR 2020 Oral)](https://arxiv.org/abs/1911.11236) in PyTorch.
 - We only support SemanticKITTI dataset now. (Welcome everyone to develop together and raise PR)
-- Our model is almost as good as the original implementation. (Validation set : Our 52.9% mIoU vs 53.9% reported in paper)
-- We place our pretrain-model in `pretrain_model/` directory.
+- Our model is almost as good as the original implementation. (Validation set : Our 52.9% mIoU vs original 53.1%)
+- We place our pretrain-model in [`pretrain_model/checkpoint.tar`](pretrain_modek/checkpoint.tar) directory.
+
+### Performance
+
+> Results on Validation Set (seq 08)
+
+- Compare with original implementation
+
+| Model                      | mIoU  |
+| -------------------------- | ----- |
+| Original Tensorflow        | 0.531 |
+| Our Pytorch Implementation | 0.529 |
+
+- Per class mIoU
+
+| mIoU | car  | bicycle | motorcycle | truck | other-vehicle | person | bicyclist | motorcyclist | road | parking | sidewalk | other-ground | building | fence | vegetation | trunk | terrain | pole | traffic-sign |
+| ---- | ------- | ---------- | ----- | ------------- | ------ | --------- | ------------ | ---- | ------- | -------- | ------------ | -------- | ----- | ---------- | ----- | ------- | ---- | ------------ | ---- |
+| 52.9 | 0.919 | 0.122 | 0.290 | 0.660 | 0.444 | 0.515 | 0.676 | 0.000 | 0.912 | 0.421 | 0.759 | 0.001 | 0.878 | 0.354 | 0.844 | 0.595 | 0.741 | 0.517 | 0.414 |
 
 ## A. Environment Setup
 
