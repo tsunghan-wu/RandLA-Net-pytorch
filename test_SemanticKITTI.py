@@ -16,6 +16,7 @@ from dataset.semkitti_testset import SemanticKITTI
 from network.RandLANet import Network
 
 
+np.random.seed(0)
 warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser()
 parser.add_argument('--checkpoint_path', default=None, help='Model checkpoint path [default: None]')
