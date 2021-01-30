@@ -135,4 +135,4 @@ class SemanticKITTI(torch_data.IterableDataset):
         input_inds = flat_inputs[4 * num_layers + 2]
         cloud_inds = flat_inputs[4 * num_layers + 3]
 
-        return inputs, input_inds, cloud_inds
+        return inputs, input_inds, cloud_inds, self.min_possibility
