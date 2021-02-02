@@ -104,7 +104,7 @@ class Tester:
 
         iter_loader = iter(self.test_loader)
         with torch.no_grad():
-            min_possibility = self.test_dataset.get_min_possibility()
+            min_possibility = self.test_dataset.min_possibility
             while np.min(min_possibility) <= 0.5:
                 batch_data, input_inds, cloud_inds, min_possibility = next(iter_loader)
                 for key in batch_data:
