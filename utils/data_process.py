@@ -9,6 +9,24 @@ import utils.nearest_neighbors.lib.python.nearest_neighbors as nearest_neighbors
 
 
 class DataProcessing:
+
+    @staticmethod
+    def load_pc_kitti(pc_path):
+        scan = np.fromfile(pc_path, dtype=np.float32)
+        scan = scan.reshape((-1, 4))
+        points = scan[:, 0:3]  # get xyz
+        return points
+
+    @staticmethod
+    def load_label_kitti(label_path, remap_lut):
+        label = np.fromfile(label_path, dtype=np.uint32)
+        label = label.reshape((-1))
+        sem_label = label & 0xFFFF  # semantic label in lower half
+        inst_label = label >> 16  # instance id in upper half
+        assert ((sem_label + (inst_label << 16) == label).all())
+        sem_label = remap_lut[sem_label]
+        return sem_label.astype(np.int32)
+    
     @staticmethod
     def load_pc_semantic3d(filename):
         pc_pd = pd.read_csv(filename, header=None, delim_whitespace=True, dtype=np.float16)

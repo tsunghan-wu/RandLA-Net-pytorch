@@ -104,8 +104,9 @@ class Tester:
 
         iter_loader = iter(self.test_loader)
         with torch.no_grad():
-            while np.min(self.test_dataset.min_possibility) <= 0.5:
-                batch_data, input_inds, cloud_inds = next(iter_loader)
+            min_possibility = self.test_dataset.min_possibility
+            while np.min(min_possibility) <= 0.5:
+                batch_data, input_inds, cloud_inds, min_possibility = next(iter_loader)
                 for key in batch_data:
                     if type(batch_data[key]) is list:
                         for i in range(cfg.num_layers):
