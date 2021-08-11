@@ -96,7 +96,13 @@ if __name__ == '__main__':
     class_ignore = DATA["learning_ignore"]
     class_inv_remap = DATA["learning_map_inv"]
     nr_classes = len(class_inv_remap)
-
+    data_config = FLAGS.datacfg
+    DATA = yaml.safe_load(open(data_config, 'r'))
+    remap_dict = DATA["learning_map"]
+    max_key = max(remap_dict.keys())
+    remap_lut = np.zeros((max_key + 100), dtype=np.int32)
+    remap_lut[list(remap_dict.keys())] = list(remap_dict.values())
+    
     # create evaluator
     ignore = []
     for cl, ign in class_ignore.items():
@@ -128,12 +134,6 @@ if __name__ == '__main__':
             label = np.load(label_file)
             label = label.reshape((-1))  # reshape to vector
         else:
-            data_config = FLAGS.datacfg
-            DATA = yaml.safe_load(open(data_config, 'r'))
-            remap_dict = DATA["learning_map"]
-            max_key = max(remap_dict.keys())
-            remap_lut = np.zeros((max_key + 100), dtype=np.int32)
-            remap_lut[list(remap_dict.keys())] = list(remap_dict.values())
             label = np.fromfile(label_file, dtype=np.int32)
             label = label.reshape((-1))
             sem_label = label & 0xFFFF  # semantic label in lower half
