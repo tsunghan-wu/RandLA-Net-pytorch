@@ -14,11 +14,12 @@ from torch.utils.data import DataLoader
 from utils.config import ConfigSemanticKITTI as cfg
 from dataset.semkitti_testset import SemanticKITTI
 from network.RandLANet import Network
-
+import pickle
 
 np.random.seed(0)
 warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser()
+parser.add_argument('--infer_type', default='sub', type=str, choices=['all', 'sub'], help='Infer ALL or just infer Subsample')
 parser.add_argument('--checkpoint_path', default=None, help='Model checkpoint path [default: None]')
 parser.add_argument('--test_id', default='08', type=str, help='Predicted sequence id [default: 08]')
 parser.add_argument('--result_dir', default='result/', help='Dump dir to save prediction [default: result/]')
@@ -136,10 +137,20 @@ class Tester:
         root_dir = os.path.join(FLAGS.result_dir, self.test_dataset.test_scan_number, 'predictions')
         os.makedirs(root_dir, exist_ok=True)
         self.logger.info(f'mkdir {root_dir}')
-
         N = len(self.test_probs)
         for j in tqdm(range(N)):
-            pred = np.argmax(self.test_probs[j], 1).astype(np.uint32)
+            if FLAGS.infer_type == 'all':
+                proj_path = os.path.join(self.test_dataset.dataset_path, self.test_dataset.test_scan_number, 'proj')
+                proj_file = os.path.join(proj_path, self.test_dataset.data_list[j][1] + '_proj.pkl')
+                if os.path.isfile(proj_file):
+                    with open(proj_file, 'rb') as f:
+                        proj_inds = pickle.load(f)
+                probs = self.test_probs[j][proj_inds[0], :]
+                pred = np.argmax(probs, 1).astype(np.uint32)
+            elif FLAGS.infer_type == 'sub':
+                pred = np.argmax(self.test_probs[j], 1).astype(np.uint32)
+            else:
+                raise TypeError("Choose what you want to infer")
             pred += 1
             if FLAGS.index_to_label is True:    # 0 - 259
                 pred = self.remap(pred)

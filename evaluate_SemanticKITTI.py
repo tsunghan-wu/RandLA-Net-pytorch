@@ -13,6 +13,10 @@ from utils.np_ioueval import iouEval
 def get_args():
     parser = argparse.ArgumentParser("./evaluate_semantics.py")
     parser.add_argument(
+        '--eval_type', '-e',
+        type=str, choices=['all', 'sub'],
+        help='Eval ALL or just eval Subsample')
+    parser.add_argument(
         '--dataset', '-d',
         type=str,
         required=True,
@@ -76,6 +80,7 @@ if __name__ == '__main__':
     # print summary of what we will do
     print("*" * 80)
     print("INTERFACE:")
+    print("Eval What:", FLAGS.eval_type)
     print("Data: ", FLAGS.dataset)
     print("Predictions: ", FLAGS.predictions)
     print("Sequences: ", FLAGS.sequences)
@@ -91,7 +96,13 @@ if __name__ == '__main__':
     class_ignore = DATA["learning_ignore"]
     class_inv_remap = DATA["learning_map_inv"]
     nr_classes = len(class_inv_remap)
-
+    data_config = FLAGS.datacfg
+    DATA = yaml.safe_load(open(data_config, 'r'))
+    remap_dict = DATA["learning_map"]
+    max_key = max(remap_dict.keys())
+    remap_lut = np.zeros((max_key + 100), dtype=np.int32)
+    remap_lut[list(remap_dict.keys())] = list(remap_dict.values())
+    
     # create evaluator
     ignore = []
     for cl, ign in class_ignore.items():
@@ -104,10 +115,12 @@ if __name__ == '__main__':
     evaluator.reset()
 
     # get label paths
-    label_names = load_label(FLAGS.dataset, FLAGS.sequences, "labels", "npy")
+    if FLAGS.eval_type == "sub":
+        label_names = load_label(FLAGS.dataset, FLAGS.sequences, "labels", "npy")
+    else:
+        label_names = load_label(FLAGS.dataset, FLAGS.sequences, "labels", "label")
     # get predictions paths
     pred_names = load_label(FLAGS.predictions, FLAGS.sequences, "predictions", "npy")
-    print(len(pred_names))
     assert(len(label_names) == len(pred_names))
 
     print("Evaluating sequences")
@@ -117,8 +130,17 @@ if __name__ == '__main__':
         label_file = label_names[i]
         pred_file = pred_names[i]
         # open label
-        label = np.load(label_file)
-        label = label.reshape((-1))  # reshape to vector
+        if FLAGS.eval_type == "sub":
+            label = np.load(label_file)
+            label = label.reshape((-1))  # reshape to vector
+        else:
+            label = np.fromfile(label_file, dtype=np.int32)
+            label = label.reshape((-1))
+            sem_label = label & 0xFFFF  # semantic label in lower half
+            inst_label = label >> 16  # instance id in upper half
+            assert ((sem_label + (inst_label << 16) == label).all())
+            label = remap_lut[sem_label]
+            
         if FLAGS.limit is not None:
             label = label[:FLAGS.limit]  # limit to desired length
         # open prediction
