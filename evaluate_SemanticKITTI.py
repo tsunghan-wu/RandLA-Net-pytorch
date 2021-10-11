@@ -55,6 +55,10 @@ def get_args():
     )
     FLAGS = parser.parse_args()
 
+    # make sure that sequences is actually a list
+    if not isinstance(FLAGS.sequences, list):
+        FLAGS.sequences = [FLAGS.sequences]
+    
     # fill in real predictions dir
     if FLAGS.predictions is None:
         FLAGS.predictions = FLAGS.dataset
